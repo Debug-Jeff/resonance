@@ -67,29 +67,6 @@ const team = [
   }
 ];
 
-const milestones = [
-  {
-    year: '2022',
-    title: 'Company Founded',
-    description: 'Started with a mission to make mental health support accessible to everyone.'
-  },
-  {
-    year: '2023',
-    title: 'AI Breakthrough',
-    description: 'Developed proprietary emotional AI technology with 95% accuracy in emotion detection.'
-  },
-  {
-    year: '2024',
-    title: '50K+ Users',
-    description: 'Reached 50,000 active users and processed over 1 million voice sessions.'
-  },
-  {
-    year: '2024',
-    title: 'Clinical Validation',
-    description: 'Published peer-reviewed research showing 40% improvement in user wellbeing.'
-  }
-];
-
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
@@ -97,12 +74,20 @@ export default function AboutPage() {
       
       <div className="pt-24">
         {/* Hero Section */}
-        <section className="py-24 sm:py-32">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <section className="py-24 sm:py-32 relative overflow-hidden">
+          {/* Background elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 animate-pulse"></div>
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gradient-to-br from-blue-400/10 to-cyan-400/10 animate-pulse" style={{ animationDelay: '1s' }}></div>
+          </div>
+
+          <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <Badge variant="secondary" className="glassmorphism px-4 py-2 mb-8">
+              <Badge variant="secondary" className="glassmorphism px-4 py-2 mb-8 border-0 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
                 <Sparkles className="w-4 h-4 mr-2" />
-                Our Story
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-medium">
+                  Our Story
+                </span>
               </Badge>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
                 Transforming Mental Health{' '}
@@ -123,7 +108,7 @@ export default function AboutPage() {
         <section className="py-24 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-              <Card className="glassmorphism border-0 shadow-xl">
+              <Card className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
                 <CardContent className="p-8">
                   <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-6">
                     <Target className="w-8 h-8 text-white" />
@@ -140,7 +125,7 @@ export default function AboutPage() {
                 </CardContent>
               </Card>
 
-              <Card className="glassmorphism border-0 shadow-xl">
+              <Card className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
                 <CardContent className="p-8">
                   <div className="w-16 h-16 rounded-2xl gradient-secondary flex items-center justify-center mb-6">
                     <Lightbulb className="w-8 h-8 text-white" />
@@ -173,9 +158,9 @@ export default function AboutPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {values.map((value, index) => (
-                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
+                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 group">
                   <CardContent className="p-6 text-center">
-                    <div className={`w-16 h-16 rounded-2xl ${value.gradient} flex items-center justify-center mx-auto mb-4`}>
+                    <div className={`w-16 h-16 rounded-2xl ${value.gradient} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
                       <value.icon className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -205,20 +190,23 @@ export default function AboutPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {team.map((member, index) => (
-                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
+                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 group">
                   <CardContent className="p-6 text-center">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                    />
+                    <div className="relative mb-4">
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-24 h-24 rounded-full mx-auto object-cover shadow-lg group-hover:shadow-xl transition-shadow"
+                      />
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 group-hover:from-purple-500/30 group-hover:to-blue-500/30 transition-all"></div>
+                    </div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                       {member.name}
                     </h3>
-                    <p className="text-sm text-purple-600 dark:text-purple-400 mb-3">
+                    <p className="text-sm text-purple-600 dark:text-purple-400 mb-3 font-medium">
                       {member.role}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
                       {member.bio}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-500">
@@ -230,105 +218,6 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
-
-        {/* Timeline = Uncomment in the future*/}
-        {/* <section className="py-24">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                Our Journey
-              </h2>
-              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                Key milestones in our mission to transform mental health
-              </p>
-            </div>
-            
-            <div className="relative">
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-purple-600 to-blue-600"></div>
-              
-              <div className="space-y-12">
-                {milestones.map((milestone, index) => (
-                  <div key={index} className={`flex items-center ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                    <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
-                      <Card className="glassmorphism border-0 shadow-xl">
-                        <CardContent className="p-6">
-                          <div className="flex items-center mb-3">
-                            <Badge variant="secondary" className="gradient-primary text-white">
-                              {milestone.year}
-                            </Badge>
-                            {index % 2 === 0 && <CheckCircle className="w-5 h-5 text-green-500 ml-2" />}
-                            {index % 2 !== 0 && <CheckCircle className="w-5 h-5 text-green-500 mr-2" />}
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            {milestone.title}
-                          </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {milestone.description}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    
-                    <div className="relative flex items-center justify-center w-8 h-8">
-                      <div className="w-4 h-4 rounded-full gradient-primary border-4 border-white dark:border-gray-900"></div>
-                    </div>
-                    
-                    <div className="w-1/2"></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section> */}
-
-        {/* Recognition = Uncomment in the future*/}
-        {/* <section className="py-24 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                Recognition & Awards
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="glassmorphism border-0 shadow-xl text-center">
-                <CardContent className="p-8">
-                  <Award className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Best Mental Health App 2024
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Digital Health Awards
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="glassmorphism border-0 shadow-xl text-center">
-                <CardContent className="p-8">
-                  <Star className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Top 10 AI Healthcare Startups
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    TechCrunch Disrupt 2024
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="glassmorphism border-0 shadow-xl text-center">
-                <CardContent className="p-8">
-                  <Brain className="w-12 h-12 text-purple-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Innovation in Mental Health
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    American Psychological Association
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section> */}
       </div>
 
       <Footer />

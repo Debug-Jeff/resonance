@@ -102,17 +102,145 @@ const testimonials = [
 ];
 
 const stats = [
-  { number: '10', label: 'Active Users', icon: Users, color: 'from-purple-500 to-pink-500' },
-  { number: '100+', label: 'Voice Sessions', icon: Mic, color: 'from-blue-500 to-cyan-500' },
-  { number: '95%', label: 'User Satisfaction', icon: Heart, color: 'from-rose-500 to-red-500' },
-  { number: '24/7', label: 'Support Available', icon: Clock, color: 'from-emerald-500 to-teal-500' }
+  { number: '10', label: 'Active Users', icon: Users, color: 'from-purple-500 to-purple-600' },
+  { number: '100+', label: 'Voice Sessions', icon: Mic, color: 'from-blue-500 to-blue-600' },
+  { number: '95%', label: 'User Satisfaction', icon: Heart, color: 'from-rose-500 to-rose-600' },
+  { number: '24/7', label: 'Support Available', icon: Clock, color: 'from-emerald-500 to-emerald-600' }
 ];
+
+// Wellness Card Component
+const WellnessCard = () => {
+  const [selectedMood, setSelectedMood] = useState(4);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const steps = [
+    { title: 'Daily Wellness Check', subtitle: 'How are you feeling today?' },
+    { title: 'Mood Selected', subtitle: 'Great! Let\'s add some context' },
+    { title: 'Insights Ready', subtitle: 'Here are your personalized insights' }
+  ];
+
+  const handleMoodSelect = (mood: number) => {
+    if (isAnimating) return;
+    
+    setSelectedMood(mood);
+    setIsAnimating(true);
+    
+    setTimeout(() => {
+      setCurrentStep(1);
+      setTimeout(() => {
+        setCurrentStep(2);
+        setTimeout(() => {
+          setCurrentStep(0);
+          setIsAnimating(false);
+        }, 3000);
+      }, 2000);
+    }, 1000);
+  };
+
+  const activities = [
+    { color: 'from-green-400 to-emerald-500', text: 'Feeling optimistic about the future', icon: TrendingUp },
+    { color: 'from-blue-400 to-cyan-500', text: 'Productive day at work', icon: Target },
+    { color: 'from-purple-400 to-pink-500', text: 'Quality time with family', icon: Heart }
+  ];
+
+  return (
+    <div className="relative backdrop-blur-xl bg-white/20 dark:bg-gray-800/20 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 border border-white/30 dark:border-gray-700/30 overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 animate-pulse"></div>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+      
+      <div className="relative z-10 space-y-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-pulse-soft shadow-lg">
+            <Heart className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white text-lg transition-all duration-500">
+              {steps[currentStep].title}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 transition-all duration-500">
+              {steps[currentStep].subtitle}
+            </p>
+          </div>
+        </div>
+        
+        {currentStep === 0 && (
+          <div className="grid grid-cols-5 gap-3 animate-fade-in">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <button
+                key={num}
+                onClick={() => handleMoodSelect(num)}
+                disabled={isAnimating}
+                className={`h-12 rounded-xl flex items-center justify-center text-sm font-semibold transition-all duration-300 hover:scale-110 cursor-pointer shadow-lg ${
+                  num === selectedMood 
+                    ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-purple-500/25' 
+                    : 'bg-white/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-600 backdrop-blur-sm'
+                } ${isAnimating ? 'pointer-events-none' : ''}`}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {currentStep === 1 && (
+          <div className="animate-fade-in">
+            <div className="flex items-center justify-center p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200/50 dark:border-purple-800/50">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-2xl font-bold text-white">{selectedMood}</span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Analyzing your mood patterns...
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 2 && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200/50 dark:border-green-800/50">
+              <div className="flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                  Great mood trend this week!
+                </span>
+              </div>
+            </div>
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200/50 dark:border-blue-800/50">
+              <div className="flex items-center">
+                <Brain className="w-5 h-5 text-blue-500 mr-2" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  AI suggests: Try meditation today
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 0 && !isAnimating && (
+          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            {activities.map((item, index) => (
+              <div key={index} className={`flex items-center space-x-3 p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-all duration-500 hover:translate-x-2 hover:shadow-lg border border-white/30 dark:border-gray-700/30`}>
+                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+                  <item.icon className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedMood, setSelectedMood] = useState(4);
 
   useEffect(() => {
     if (!loading && user) {
@@ -211,49 +339,7 @@ export default function LandingPage() {
               <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0 rotate-0' : 'opacity-0 translate-y-10 rotate-3'}`} style={{ transitionDelay: '0.3s' }}>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-500 transform rotate-2 rounded-3xl opacity-10 animate-pulse"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-purple-500 transform -rotate-1 rounded-3xl opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-                <div className="relative backdrop-blur-xl bg-white/20 dark:bg-gray-800/20 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 border border-white/30 dark:border-gray-700/30">
-                  <div className="space-y-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-pulse-soft shadow-lg">
-                        <Heart className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white text-lg">Daily Wellness Check</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">How are you feeling today?</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-5 gap-3">
-                      {[1, 2, 3, 4, 5].map((num) => (
-                        <div
-                          key={num}
-                          className={`h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-all duration-300 hover:scale-110 cursor-pointer shadow-lg ${
-                            num === 4 
-                              ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-purple-500/25' 
-                              : 'bg-white/80 dark:bg-gray-700/80 text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-600 backdrop-blur-sm'
-                          }`}
-                        >
-                          {num}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {[
-                        { color: 'from-green-400 to-emerald-500', text: 'Feeling optimistic about the future', icon: TrendingUp },
-                        { color: 'from-blue-400 to-cyan-500', text: 'Productive day at work', icon: Target },
-                        { color: 'from-purple-400 to-pink-500', text: 'Quality time with family', icon: Heart }
-                      ].map((item, index) => (
-                        <div key={index} className={`flex items-center space-x-3 p-3 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-all duration-500 hover:translate-x-2 hover:shadow-lg border border-white/30 dark:border-gray-700/30`} style={{ transitionDelay: `${0.8 + index * 0.1}s` }}>
-                          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center`}>
-                            <item.icon className="w-4 h-4 text-white" />
-                          </div>
-                          <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <WellnessCard />
               </div>
             </div>
           </div>
@@ -295,12 +381,12 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               {features.map((feature, index) => (
                 <div key={index} className={`transition-all duration-700 hover:scale-[1.02] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${1.5 + index * 0.2}s` }}>
-                  <div className={`relative p-8 rounded-3xl bg-gradient-to-br ${feature.bgGradient} border border-white/30 dark:border-gray-700/30 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden`}>
+                  <Card className={`relative p-8 rounded-3xl bg-gradient-to-br ${feature.bgGradient} border border-white/30 dark:border-gray-700/30 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden`}>
                     {/* Subtle background pattern */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
                     
-                    <div className="relative z-10">
+                    <CardContent className="relative z-10 p-0">
                       <div className={`w-16 h-16 rounded-2xl ${feature.iconBg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                         <feature.icon className="w-8 h-8 text-white" />
                       </div>
@@ -320,73 +406,13 @@ export default function LandingPage() {
                           </span>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </div>
               ))}
             </div>
           </div>
         </section>
-
-        {/* Enhanced Testimonials Section */}
-        {/*Uncomment aftre getting actual testimaonials.*/}
-        {/* <section className="py-24 sm:py-32 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-gray-800/50 dark:to-purple-900/50 backdrop-blur-sm"></div>
-          <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-4">
-                Trusted by{' '}
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  thousands worldwide
-                </span>
-              </h2>
-              <p className="text-lg leading-8 text-gray-600 dark:text-gray-400">
-                See how Resonance is helping people transform their mental health and emotional wellbeing.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className={`transition-all duration-500 hover:scale-105 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${2 + index * 0.2}s` }}>
-                  <div className={`relative p-8 rounded-3xl bg-gradient-to-br ${testimonial.bgGradient} border border-white/30 dark:border-gray-700/30 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 group h-full`}>
-                    <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-full flex items-center justify-center">
-                      <MessageCircle className="w-4 h-4 text-gray-400" />
-                    </div>
-                    
-                    <div className="flex items-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    
-                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-7 font-medium">
-                      "{testimonial.content}"
-                    </p>
-                    
-                    <div className="flex items-center">
-                      <div className="relative">
-                        <img 
-                          src={testimonial.avatar} 
-                          alt={testimonial.name}
-                          className="w-12 h-12 rounded-2xl mr-4 object-cover shadow-lg"
-                        />
-                        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${testimonial.gradient} opacity-20`}></div>
-                      </div>
-                      <div>
-                        <div className="font-bold text-gray-900 dark:text-white">
-                          {testimonial.name}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                          {testimonial.role}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section> */}
 
         {/* CTA Section */}
         <section className="py-24 sm:py-32">
