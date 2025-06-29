@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-// Uncomment to use Resend for email
-// import { Resend } from 'resend';
+import { Resend } from 'resend';
+import { ContactFormEmailTemplate } from '@/components/emails/contact-form-email';
+import { ContactConfirmationEmailTemplate } from '@/components/emails/contact-confirmation-email';
 
-// Uncomment to use Resend for email
-// const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend with API key
+const resend = new Resend(process.env.RESEND_API_KEY || 're_LJkvCUbj_HwN4bvNkagtLhwrYjAAc5Dsa');
 
 export async function POST(request: Request) {
   try {
@@ -50,48 +51,41 @@ export async function POST(request: Request) {
       );
     }
 
-    // Send email notification (uncomment to use Resend)
-    // const { data, error: emailError } = await resend.emails.send({
-    //   from: 'Resonance <contact@resonance.ai>',
-    //   to: ['support@resonance.ai'],
-    //   subject: `New Contact Form: ${subject}`,
-    //   html: `
-    //     <h1>New Contact Form Submission</h1>
-    //     <p><strong>Name:</strong> ${name}</p>
-    //     <p><strong>Email:</strong> ${email}</p>
-    //     <p><strong>Type:</strong> ${type || 'General'}</p>
-    //     <p><strong>Subject:</strong> ${subject}</p>
-    //     <p><strong>Message:</strong></p>
-    //     <p>${message.replace(/\n/g, '<br>')}</p>
-    //   `,
-    // });
+    // Send email notification to admin
+    const { data: adminEmailData, error: adminEmailError } = await resend.emails.send({
+      from: 'Resonance <contact@resonance.ai>',
+      to: ['support@resonance.ai'],
+      subject: `New Contact Form: ${subject}`,
+      react: ContactFormEmailTemplate({
+        name,
+        email,
+        type: type || 'General',
+        subject,
+        message
+      }),
+    });
     
-    // if (emailError) {
-    //   console.error('Email error:', emailError);
-    //   // Continue anyway since we saved to database
-    // }
+    if (adminEmailError) {
+      console.error('Admin email error:', adminEmailError);
+      // Continue anyway since we saved to database
+    }
 
-    // Send confirmation email to user (uncomment to use Resend)
-    // const { error: confirmationError } = await resend.emails.send({
-    //   from: 'Resonance <contact@resonance.ai>',
-    //   to: [email],
-    //   subject: 'We received your message - Resonance',
-    //   html: `
-    //     <h1>Thank you for contacting Resonance</h1>
-    //     <p>Hello ${name},</p>
-    //     <p>We've received your message and will get back to you as soon as possible.</p>
-    //     <p>For your records, here's a copy of your message:</p>
-    //     <p><strong>Subject:</strong> ${subject}</p>
-    //     <p><strong>Message:</strong></p>
-    //     <p>${message.replace(/\n/g, '<br>')}</p>
-    //     <p>Best regards,<br>The Resonance Team</p>
-    //   `,
-    // });
+    // Send confirmation email to user
+    const { error: confirmationError } = await resend.emails.send({
+      from: 'Resonance <contact@resonance.ai>',
+      to: [email],
+      subject: 'We received your message - Resonance',
+      react: ContactConfirmationEmailTemplate({
+        name,
+        subject,
+        message
+      }),
+    });
     
-    // if (confirmationError) {
-    //   console.error('Confirmation email error:', confirmationError);
-    //   // Continue anyway
-    // }
+    if (confirmationError) {
+      console.error('Confirmation email error:', confirmationError);
+      // Continue anyway
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
