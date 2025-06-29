@@ -44,7 +44,6 @@ const nextConfig = withPWA({
     
     return config;
   }
-  // Removed the headers configuration as it's not compatible with static export
 });
 
 module.exports = nextConfig;
