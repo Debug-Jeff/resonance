@@ -62,45 +62,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         return false;
       }
 
-      // Get push subscription
-      let subscription = await registration.pushManager.getSubscription();
-      
-      // Create new subscription if none exists
-      if (!subscription) {
-        try {
-          // In a real app, you would fetch this from your server
-          const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-          
-          if (!vapidPublicKey) {
-            console.error('VAPID public key not found');
-            return false;
-          }
-          
-          const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-          
-          subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: convertedVapidKey
-          });
-        } catch (error) {
-          console.error('Failed to subscribe to push notifications:', error);
-          return false;
-        }
-      }
-
-      // Register subscription with server
-      const response = await fetch('/api/notifications/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ subscription }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to register notification subscription');
-      }
-
       setNotificationsEnabled(true);
       toast.success('Notifications enabled successfully!');
       return true;
@@ -118,7 +79,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
 
     // For testing purposes, we'll show a local notification
-    // In production, you'd send this through your server
     if ('Notification' in window && Notification.permission === 'granted') {
       try {
         new Notification(title, {

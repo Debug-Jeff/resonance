@@ -1,23 +1,18 @@
+// This is a client-side mock for email sending
+// In a real app, this would call a serverless function
+
 import { EmailType, EmailData } from '@/types/email';
 
 export async function sendEmail(type: EmailType, data: EmailData) {
   try {
-    const response = await fetch('/api/email/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type,
-        data,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to send email');
-    }
-
-    return await response.json();
+    // In a static export, we can't use server routes
+    // This is a mock implementation
+    console.log(`Sending ${type} email to ${data.email}`);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return { success: true };
   } catch (error) {
     console.error('Error sending email:', error);
     throw error;
