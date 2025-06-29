@@ -14,6 +14,7 @@ import {
   Users, Headphones, AlertTriangle, Clock, CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
 
 const contactMethods = [
   {
@@ -57,6 +58,7 @@ export default function ContactPage() {
     type: 'general'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const supabase = createClient();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -68,17 +70,19 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      // Send form data to API
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit form');
+      // Store contact submission in database
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          type: formData.type || 'general'
+        });
+        
+      if (error) {
+        throw error;
       }
       
       toast.success('Message sent successfully! We\'ll get back to you within 24 hours.');

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
 
 interface ExportButtonProps {
   variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link' | 'destructive';
@@ -17,25 +18,52 @@ export function ExportButton({
   className = ''
 }: ExportButtonProps) {
   const [exporting, setExporting] = useState(false);
+  const supabase = createClient();
 
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await fetch('/api/export-data', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to export data');
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
       }
-
-      const data = await response.json();
+      
+      // Fetch user data
+      const [profileResult, moodEntriesResult, voiceSessionsResult, notesResult, settingsResult] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('mood_entries').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('voice_sessions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('notes').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('user_settings').select('*').eq('user_id', user.id).single()
+      ]);
+      
+      // Check for errors
+      const errors = [];
+      if (profileResult.error) errors.push(`Profile error: ${profileResult.error.message}`);
+      if (moodEntriesResult.error) errors.push(`Mood entries error: ${moodEntriesResult.error.message}`);
+      if (voiceSessionsResult.error) errors.push(`Voice sessions error: ${voiceSessionsResult.error.message}`);
+      if (notesResult.error) errors.push(`Notes error: ${notesResult.error.message}`);
+      
+      if (errors.length > 0) {
+        console.error('Errors occurred during data export:', errors);
+        throw new Error('Failed to fetch user data');
+      }
+      
+      // Prepare export data
+      const userData = {
+        profile: profileResult.data,
+        moodEntries: moodEntriesResult.data || [],
+        voiceSessions: voiceSessionsResult.data || [],
+        notes: notesResult.data || [],
+        settings: settingsResult.data || {},
+        exportDate: new Date().toISOString(),
+        exportVersion: '1.0'
+      };
       
       // Create a downloadable file
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       
       // Create download link and trigger download
