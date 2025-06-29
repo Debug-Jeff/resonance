@@ -17,6 +17,8 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
 import Link from 'next/link';
+import { VoiceRecorder } from '@/components/voice-analysis/voice-recorder';
+import { AIAnalysisResult } from '@/components/voice-analysis/ai-analysis-result';
 
 interface MoodEntry {
   id: string;
@@ -71,6 +73,10 @@ export default function DashboardPage() {
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [quickResponse, setQuickResponse] = useState('');
+  const [showRecorder, setShowRecorder] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [savingSession, setSavingSession] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const animationRef = useRef<number>();
@@ -121,128 +127,141 @@ export default function DashboardPage() {
     }
   };
 
-  const startRecording = async () => {
+  const handleQuickResponseSubmit = () => {
+    if (!quickResponse.trim()) {
+      toast.error('Please enter a response or use voice recording');
+      return;
+    }
+    
+    setShowRecorder(false);
+    setIsAnalyzing(true);
+    
+    // Call the edge function for analysis
+    analyzeText(quickResponse);
+  };
+
+  const analyzeText = async (text: string) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      
-      // Set up audio analysis for visual feedback
-      const audioContext = new AudioContext();
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      analyserRef.current = analyser;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/analyze-voice`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcript: text,
+          duration: 30 // Default duration for text input
+        })
+      });
 
-      // Start audio level monitoring
-      const updateAudioLevel = () => {
-        if (analyserRef.current) {
-          const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-          analyserRef.current.getByteFrequencyData(dataArray);
-          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-          setAudioLevel(average);
-        }
-        if (isRecording) {
-          animationRef.current = requestAnimationFrame(updateAudioLevel);
-        }
-      };
-      updateAudioLevel();
-      
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          setAudioChunks(prev => [...prev, event.data]);
-        }
-      };
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
 
-      recorder.onstop = () => {
-        stream.getTracks().forEach(track => track.stop());
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
-      };
-
-      setMediaRecorder(recorder);
-      setAudioChunks([]);
-      recorder.start();
-      setIsRecording(true);
-      setRecordingTime(0);
-
-      // Start timer
-      intervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-
-      toast.success('Recording started - speak naturally!');
+      const analysis = await response.json();
+      setAnalysisResult(analysis);
+      setShowAnalysis(true);
     } catch (error) {
-      console.error('Error starting recording:', error);
-      toast.error('Failed to start recording. Please check microphone permissions.');
+      console.error('Error analyzing text:', error);
+      toast.error('Failed to analyze your response');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
-  const stopRecording = async () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-      setAudioLevel(0);
+  const handleRecordingComplete = async (audioBlob: Blob, duration: number) => {
+    setShowRecorder(false);
+    setIsAnalyzing(true);
+    
+    try {
+      // Upload audio to storage
+      const fileName = `voice-session-${Date.now()}.webm`;
+      const filePath = `${user?.id}/${fileName}`;
       
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('voice-recordings')
+        .upload(filePath, audioBlob);
+        
+      if (uploadError) {
+        console.error('Error uploading audio:', uploadError);
+        throw new Error('Failed to upload audio');
+      }
+      
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('voice-recordings')
+        .getPublicUrl(filePath);
+        
+      const audioUrl = urlData.publicUrl;
+      
+      // Convert audio to text (in a real app, you'd use a speech-to-text service)
+      // For now, we'll use a mock transcript
+      const mockTranscript = "I've been feeling a bit overwhelmed lately with work and personal responsibilities. Sometimes it feels like there's just too much to handle, but I'm trying to stay positive and take things one day at a time.";
+      
+      // Analyze the transcript
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/analyze-voice`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcript: mockTranscript,
+          duration,
+          audioUrl
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Analysis failed');
       }
 
-      // Simulate quick AI analysis
-      setIsAnalyzing(true);
-      
-      // Mock transcript for demo
-      const mockTranscript = quickResponse || "I've been feeling a bit overwhelmed lately with work and personal responsibilities. Sometimes it feels like there's just too much to handle, but I'm trying to stay positive and take things one day at a time.";
-      
-      try {
-        // Call the edge function for analysis
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/analyze-voice`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            transcript: mockTranscript,
-            duration: recordingTime
-          })
+      const analysis = await response.json();
+      setAnalysisResult({
+        ...analysis,
+        transcript: mockTranscript,
+        audioUrl
+      });
+      setShowAnalysis(true);
+    } catch (error) {
+      console.error('Error processing recording:', error);
+      toast.error('Failed to process your recording');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const saveAnalysisResult = async () => {
+    if (!analysisResult) return;
+    
+    setSavingSession(true);
+    try {
+      const { error } = await supabase
+        .from('voice_sessions')
+        .insert({
+          user_id: user?.id,
+          title: `Quick Check-in - ${format(new Date(), 'MMM dd')}`,
+          transcript: analysisResult.transcript || quickResponse,
+          duration: recordingTime || 30,
+          emotions: analysisResult.emotions,
+          ai_response: analysisResult.aiResponse,
+          mood_score: analysisResult.moodScore,
+          tags: analysisResult.tags || ['quick-checkin'],
+          audio_url: analysisResult.audioUrl
         });
 
-        if (!response.ok) {
-          throw new Error('Analysis failed');
-        }
+      if (error) throw error;
 
-        const analysis = await response.json();
-        
-        // Save the session
-        const { error } = await supabase
-          .from('voice_sessions')
-          .insert({
-            user_id: user?.id,
-            title: `Quick Check-in - ${format(new Date(), 'MMM dd')}`,
-            transcript: mockTranscript,
-            duration: recordingTime,
-            emotions: analysis.emotions,
-            ai_response: analysis.aiResponse,
-            mood_score: analysis.moodScore,
-            tags: analysis.tags || ['quick-checkin']
-          });
-
-        if (error) throw error;
-
-        toast.success('Session analyzed and saved!');
-        setQuickResponse('');
-        setRecordingTime(0);
-        fetchDashboardData();
-        
-      } catch (error) {
-        console.error('Error analyzing session:', error);
-        toast.error('Analysis failed, but recording was saved');
-      } finally {
-        setIsAnalyzing(false);
-      }
+      toast.success('Session analyzed and saved!');
+      setQuickResponse('');
+      setRecordingTime(0);
+      setShowAnalysis(false);
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error saving session:', error);
+      toast.error('Failed to save session');
+    } finally {
+      setSavingSession(false);
     }
   };
 
@@ -342,10 +361,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quick Response Input */}
-                {!isRecording && !isAnalyzing && (
+                {!showRecorder && !showAnalysis && !isAnalyzing && (
                   <div className="space-y-3">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Quick response (optional):
+                      Quick response:
                     </label>
                     <div className="flex space-x-2">
                       <input
@@ -356,13 +375,56 @@ export default function DashboardPage() {
                         className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
                       <Button
-                        onClick={startRecording}
+                        onClick={handleQuickResponseSubmit}
                         className="gradient-primary hover:scale-105 transition-transform px-4"
                       >
                         <Send className="w-4 h-4" />
                       </Button>
                     </div>
+                    <div className="text-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setShowRecorder(true)}
+                        className="text-purple-600 dark:text-purple-400"
+                      >
+                        <Mic className="w-4 h-4 mr-1" />
+                        Use voice instead
+                      </Button>
+                    </div>
                   </div>
+                )}
+                
+                {/* Voice Recorder */}
+                {showRecorder && (
+                  <VoiceRecorder 
+                    onRecordingComplete={handleRecordingComplete}
+                    onCancel={() => setShowRecorder(false)}
+                  />
+                )}
+                
+                {/* Loading State */}
+                {isAnalyzing && (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 rounded-full gradient-primary mx-auto mb-4 flex items-center justify-center animate-pulse">
+                      <Brain className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Analyzing your response...
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Our AI is processing your input to provide personalized insights
+                    </p>
+                  </div>
+                )}
+                
+                {/* Analysis Result */}
+                {showAnalysis && analysisResult && (
+                  <AIAnalysisResult 
+                    result={analysisResult}
+                    onSave={saveAnalysisResult}
+                    saving={savingSession}
+                  />
                 )}
               </div>
 
@@ -392,13 +454,11 @@ export default function DashboardPage() {
                           ? 'bg-blue-500 hover:bg-blue-600 animate-spin'
                           : 'gradient-primary hover:scale-110 shadow-xl hover:shadow-2xl'
                     }`}
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isAnalyzing}
+                    onClick={() => setShowRecorder(true)}
+                    disabled={isAnalyzing || showRecorder || showAnalysis}
                   >
                     {isAnalyzing ? (
                       <Brain className="w-12 h-12 text-white" />
-                    ) : isRecording ? (
-                      <Square className="w-12 h-12 text-white" />
                     ) : (
                       <Mic className="w-12 h-12 text-white" />
                     )}
@@ -416,24 +476,6 @@ export default function DashboardPage() {
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      </div>
-                    </div>
-                  ) : isRecording ? (
-                    <div className="space-y-2">
-                      <p className="text-lg font-medium text-red-600 dark:text-red-400">
-                        Recording... {formatTime(recordingTime)}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Speak naturally, I'm listening
-                      </p>
-                      <div className="flex items-center justify-center space-x-2">
-                        <Volume2 className="w-4 h-4 text-red-500" />
-                        <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-red-500 transition-all duration-100"
-                            style={{ width: `${Math.min(audioLevel / 2, 100)}%` }}
-                          ></div>
-                        </div>
                       </div>
                     </div>
                   ) : (
