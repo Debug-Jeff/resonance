@@ -159,7 +159,10 @@ export default function DashboardPage() {
       }
 
       const analysis = await response.json();
-      setAnalysisResult(analysis);
+      setAnalysisResult({
+        ...analysis,
+        transcript: text
+      });
       setShowAnalysis(true);
     } catch (error) {
       console.error('Error analyzing text:', error);
