@@ -20,6 +20,8 @@ export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glassmorphism border-b border-purple-200/50 dark:border-purple-800/50">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -81,65 +83,71 @@ export function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu modal */}
       {mobileMenuOpen && (
         <>
           {/* Backdrop */}
           <div 
             className="fixed inset-0 z-40 bg-black/50 lg:hidden" 
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={closeMobileMenu}
           />
           
-          {/* Mobile menu panel */}
-          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto glassmorphism px-6 py-6 sm:max-w-sm lg:hidden">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="-m-1.5 p-1.5 flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
-                  <Heart className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  Resonance
-                </span>
-              </Link>
-              <Button
-                variant="ghost"
-                className="-m-2.5 rounded-md p-2.5"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="sr-only">Close menu</span>
-                <X className="h-6 w-6" aria-hidden="true" />
-              </Button>
-            </div>
-            <div className="mt-6 flow-root">
-              <div className="-my-6 divide-y divide-gray-500/10">
-                <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={cn(
-                        "-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
-                        pathname === item.href
-                          ? "text-purple-600 dark:text-purple-400"
-                          : "text-gray-900 dark:text-gray-100"
-                      )}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-                <div className="py-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Theme</span>
-                    <ThemeToggle />
+          {/* Centered Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:hidden">
+            <div className="w-full max-w-sm glassmorphism rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/20 overflow-hidden">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-gray-700/10">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
+                    <Heart className="w-4 h-4 text-white" />
                   </div>
-                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    Resonance
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full w-8 h-8 p-0"
+                  onClick={closeMobileMenu}
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close menu</span>
+                </Button>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="p-6 space-y-4">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "block rounded-lg px-4 py-3 text-base font-semibold leading-7 transition-all duration-200 hover:bg-white/10 dark:hover:bg-gray-800/10",
+                      pathname === item.href
+                        ? "text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-900/20"
+                        : "text-gray-900 dark:text-gray-100"
+                    )}
+                    onClick={closeMobileMenu}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="p-6 pt-0 space-y-4 border-t border-white/10 dark:border-gray-700/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Theme</span>
+                  <ThemeToggle />
+                </div>
+                <div className="space-y-3">
+                  <Link href="/auth/signin" onClick={closeMobileMenu}>
                     <Button variant="outline" className="w-full">
                       Sign In
                     </Button>
                   </Link>
-                  <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/auth/signup" onClick={closeMobileMenu}>
                     <Button className="w-full gradient-primary">
                       Get Started
                     </Button>

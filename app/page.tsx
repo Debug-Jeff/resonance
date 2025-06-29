@@ -108,11 +108,20 @@ const stats = [
   { number: '24/7', label: 'Support Available', icon: Clock, color: 'from-emerald-500 to-teal-500' }
 ];
 
+const wellnessTips = [
+  "Take 5 deep breaths when feeling overwhelmed. This activates your parasympathetic nervous system.",
+  "Write down 3 things you're grateful for today. Gratitude rewires your brain for positivity.",
+  "Step outside for 10 minutes. Natural light and fresh air boost mood and energy levels.",
+  "Stretch or do gentle movement. Physical activity releases endorphins naturally.",
+  "Connect with a friend or loved one. Social connections are vital for mental health."
+];
+
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedMood, setSelectedMood] = useState(4);
+  const [todaysTip] = useState(wellnessTips[Math.floor(Math.random() * wellnessTips.length)]);
 
   useEffect(() => {
     if (!loading && user) {
@@ -252,6 +261,23 @@ export default function LandingPage() {
                         </div>
                       ))}
                     </div>
+
+                    {/* Today's Wellness Tip */}
+                    <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200/50 dark:border-yellow-800/50">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                          <Sparkles className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                            Today's Wellness Tip
+                          </h4>
+                          <p className="text-xs text-yellow-700 dark:text-yellow-300 leading-relaxed">
+                            {todaysTip}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -327,66 +353,6 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-
-        {/* Enhanced Testimonials Section */}
-        {/*Uncomment aftre getting actual testimaonials.*/}
-        {/* <section className="py-24 sm:py-32 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-blue-50/50 dark:from-gray-800/50 dark:to-purple-900/50 backdrop-blur-sm"></div>
-          <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-4">
-                Trusted by{' '}
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  thousands worldwide
-                </span>
-              </h2>
-              <p className="text-lg leading-8 text-gray-600 dark:text-gray-400">
-                See how Resonance is helping people transform their mental health and emotional wellbeing.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className={`transition-all duration-500 hover:scale-105 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${2 + index * 0.2}s` }}>
-                  <div className={`relative p-8 rounded-3xl bg-gradient-to-br ${testimonial.bgGradient} border border-white/30 dark:border-gray-700/30 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-500 group h-full`}>
-                    <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-full flex items-center justify-center">
-                      <MessageCircle className="w-4 h-4 text-gray-400" />
-                    </div>
-                    
-                    <div className="flex items-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    
-                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-7 font-medium">
-                      "{testimonial.content}"
-                    </p>
-                    
-                    <div className="flex items-center">
-                      <div className="relative">
-                        <img 
-                          src={testimonial.avatar} 
-                          alt={testimonial.name}
-                          className="w-12 h-12 rounded-2xl mr-4 object-cover shadow-lg"
-                        />
-                        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${testimonial.gradient} opacity-20`}></div>
-                      </div>
-                      <div>
-                        <div className="font-bold text-gray-900 dark:text-white">
-                          {testimonial.name}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                          {testimonial.role}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section> */}
 
         {/* CTA Section */}
         <section className="py-24 sm:py-32">
