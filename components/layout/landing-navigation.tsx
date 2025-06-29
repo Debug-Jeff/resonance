@@ -83,9 +83,15 @@ export function Navigation() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden">
-          <div className="fixed inset-0 z-50" />
-          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto glassmorphism px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden" 
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Mobile menu panel */}
+          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto glassmorphism px-6 py-6 sm:max-w-sm lg:hidden">
             <div className="flex items-center justify-between">
               <Link href="/" className="-m-1.5 p-1.5 flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
@@ -142,7 +148,7 @@ export function Navigation() {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );
