@@ -12,7 +12,7 @@ import {
   Heart, Mic, TrendingUp, Calendar, Smile, 
   MessageCircle, BarChart3, Lightbulb, Plus,
   Play, Pause, Square, Volume2, Sparkles,
-  Brain, Waves, Send, ArrowRight
+  Brain, Waves, Send, ArrowRight, Phone
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
