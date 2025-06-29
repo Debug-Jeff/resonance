@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { 
-  Mail, Phone, MapPin, Clock, Send, MessageCircle,
-  Sparkles, Heart, Users, Headphones, AlertTriangle
+  Mail, MessageCircle, Send, Sparkles, Heart, 
+  Users, Headphones, AlertTriangle, Clock, CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -23,14 +23,6 @@ const contactMethods = [
     contact: 'support@resonance.ai',
     action: 'mailto:support@resonance.ai',
     gradient: 'gradient-primary'
-  },
-  {
-    icon: Phone,
-    title: 'Phone Support',
-    description: 'Speak with our team directly',
-    contact: '1-800-RESONANCE',
-    action: 'tel:1-800-736-6626',
-    gradient: 'gradient-secondary'
   },
   {
     icon: MessageCircle,
@@ -47,27 +39,6 @@ const contactMethods = [
     contact: 'Call 988 or text HOME to 741741',
     action: 'tel:988',
     gradient: 'gradient-warm'
-  }
-];
-
-const officeLocations = [
-  {
-    city: 'San Francisco',
-    address: '123 Innovation Drive, Suite 400',
-    zipcode: 'San Francisco, CA 94105',
-    phone: '+1 (415) 555-0123'
-  },
-  {
-    city: 'New York',
-    address: '456 Tech Avenue, Floor 12',
-    zipcode: 'New York, NY 10001',
-    phone: '+1 (212) 555-0456'
-  },
-  {
-    city: 'Austin',
-    address: '789 Startup Boulevard, Building C',
-    zipcode: 'Austin, TX 78701',
-    phone: '+1 (512) 555-0789'
   }
 ];
 
@@ -140,7 +111,7 @@ export default function ContactPage() {
         {/* Contact Methods */}
         <section className="py-16">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {contactMethods.map((method, index) => (
                 <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
                   <CardContent className="p-6 text-center">
@@ -280,36 +251,6 @@ export default function ContactPage() {
 
               {/* Contact Information */}
               <div className="space-y-8">
-                {/* Office Locations */}
-                <Card className="glassmorphism border-0 shadow-xl">
-                  <CardContent className="p-8">
-                    <div className="flex items-center mb-6">
-                      <MapPin className="w-6 h-6 text-purple-600 mr-3" />
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Office Locations
-                      </h3>
-                    </div>
-                    <div className="space-y-6">
-                      {officeLocations.map((office, index) => (
-                        <div key={index} className="border-b border-gray-200 dark:border-gray-700 last:border-b-0 pb-4 last:pb-0">
-                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                            {office.city}
-                          </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                            {office.address}
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                            {office.zipcode}
-                          </p>
-                          <p className="text-sm text-purple-600 dark:text-purple-400">
-                            {office.phone}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
                 {/* Support Hours */}
                 <Card className="glassmorphism border-0 shadow-xl">
                   <CardContent className="p-8">
@@ -357,18 +298,47 @@ export default function ContactPage() {
                       </h3>
                     </div>
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/faq'}>
                         <Heart className="w-4 h-4 mr-2" />
                         View FAQ
                       </Button>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => window.open('mailto:community@resonance.ai')}>
                         <Users className="w-4 h-4 mr-2" />
                         Community Forum
                       </Button>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => window.open('mailto:help@resonance.ai')}>
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Help Center
                       </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Company Info */}
+                <Card className="glassmorphism border-0 shadow-xl">
+                  <CardContent className="p-8">
+                    <div className="flex items-center mb-6">
+                      <Heart className="w-6 h-6 text-purple-600 mr-3" />
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        About Resonance
+                      </h3>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 leading-7 mb-4">
+                      We're a passionate team dedicated to making mental health support accessible to everyone through innovative AI technology.
+                    </p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center text-gray-600 dark:text-gray-400">
+                        <Mail className="w-4 h-4 mr-2" />
+                        support@resonance.ai
+                      </div>
+                      <div className="flex items-center text-gray-600 dark:text-gray-400">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        HIPAA Compliant
+                      </div>
+                      <div className="flex items-center text-gray-600 dark:text-gray-400">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        SOC 2 Certified
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
