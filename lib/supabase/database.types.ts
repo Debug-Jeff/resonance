@@ -18,6 +18,9 @@ export interface Database {
           theme: string
           joined_at: string
           updated_at: string
+          is_admin: boolean
+          gender: string | null
+          phone: string | null
         }
         Insert: {
           id: string
@@ -27,6 +30,9 @@ export interface Database {
           theme?: string
           joined_at?: string
           updated_at?: string
+          is_admin?: boolean
+          gender?: string | null
+          phone?: string | null
         }
         Update: {
           id?: string
@@ -36,6 +42,9 @@ export interface Database {
           theme?: string
           joined_at?: string
           updated_at?: string
+          is_admin?: boolean
+          gender?: string | null
+          phone?: string | null
         }
       }
       voice_sessions: {
@@ -50,6 +59,7 @@ export interface Database {
           mood_score: number | null
           tags: string[]
           created_at: string
+          audio_url?: string | null
         }
         Insert: {
           id?: string
@@ -62,6 +72,7 @@ export interface Database {
           mood_score?: number | null
           tags?: string[]
           created_at?: string
+          audio_url?: string | null
         }
         Update: {
           id?: string
@@ -74,6 +85,7 @@ export interface Database {
           mood_score?: number | null
           tags?: string[]
           created_at?: string
+          audio_url?: string | null
         }
       }
       mood_entries: {
@@ -159,6 +171,64 @@ export interface Database {
           notifications?: boolean
           privacy_level?: string
           crisis_contacts?: Json
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      contact_submissions: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          subject: string
+          message: string
+          type: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          subject: string
+          message: string
+          type?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          subject?: string
+          message?: string
+          type?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      push_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          subscription: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          subscription: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          subscription?: Json
           created_at?: string
           updated_at?: string
         }

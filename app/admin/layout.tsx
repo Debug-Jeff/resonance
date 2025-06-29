@@ -1,0 +1,71 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/auth-provider';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AdminSidebar } from '@/components/admin/admin-sidebar';
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, profile, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading) {
+      // Check if user is logged in
+      if (!user) {
+        router.push('/auth/signin?redirect=/admin');
+        return;
+      }
+      
+      // Check if user is an admin
+      if (profile && !profile.is_admin) {
+        router.push('/dashboard');
+      }
+    }
+  }, [user, profile, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+        <div className="flex">
+          <div className="w-64 h-screen bg-white/50 dark:bg-gray-800/50 p-4">
+            <Skeleton className="h-8 w-32 mb-8" />
+            <div className="space-y-4">
+              {[...Array(7)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          </div>
+          <div className="flex-1 p-8">
+            <Skeleton className="h-8 w-64 mb-6" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-32 w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || (profile && !profile.is_admin)) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+      <div className="flex">
+        <AdminSidebar />
+        <main className="flex-1 p-6 md:p-8 pt-20 md:pt-8 md:ml-64">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
