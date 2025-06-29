@@ -339,7 +339,7 @@ export default function DashboardPage() {
                     Hi {profile?.name || 'there'}! 👋
                   </h1>
                   <p className="text-lg text-gray-600 dark:text-gray-400">
-                    I'm your AI companion, ready to listen and support you. 
+                    I&apos;m your AI companion, ready to listen and support you. 
                   </p>
                 </div>
 
@@ -351,7 +351,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
-                        Let's talk about it
+                        Let&apos;s talk about it
                       </p>
                       <p className="text-purple-700 dark:text-purple-300">
                         "{conversationStarter}"
