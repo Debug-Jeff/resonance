@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '@/contexts/auth-provider';
+import { NotificationProvider } from '@/components/notifications/notification-provider';
 import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -40,6 +41,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://resonance.ai',
   },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -51,8 +53,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <meta name="theme-color" content="#8B5CF6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -66,8 +67,10 @@ export default function RootLayout({
           disableTransitionOnChange={false}
         >
           <AuthProvider>
-            {children}
-            <Toaster richColors position="top-right" />
+            <NotificationProvider>
+              {children}
+              <Toaster richColors position="top-right" />
+            </NotificationProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

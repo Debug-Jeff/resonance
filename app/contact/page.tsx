@@ -30,7 +30,7 @@ const contactMethods = [
     description: 'Chat with us in real-time',
     contact: 'Available 9 AM - 6 PM PST',
     action: '#',
-    gradient: 'gradient-accent'
+    gradient: 'gradient-secondary'
   },
   {
     icon: AlertTriangle,
@@ -67,18 +67,34 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast.success('Message sent successfully! We\'ll get back to you within 24 hours.');
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: '',
-      type: 'general'
-    });
-    setIsSubmitting(false);
+    try {
+      // Send form data to API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+      
+      toast.success('Message sent successfully! We\'ll get back to you within 24 hours.');
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+        type: 'general'
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('Failed to send message. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

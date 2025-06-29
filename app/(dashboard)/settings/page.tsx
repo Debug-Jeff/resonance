@@ -15,8 +15,11 @@ import { toast } from 'sonner';
 import { 
   User, Mail, Bell, Shield, Phone, Trash2, 
   Save, Upload, Settings as SettingsIcon, 
-  Lock, Eye, EyeOff, AlertTriangle, Camera, Check
+  Lock, Eye, EyeOff, AlertTriangle, Camera, Check,
+  Download
 } from 'lucide-react';
+import { useNotifications } from '@/components/notifications/notification-provider';
+import { ExportButton } from '@/components/data-export/export-button';
 
 interface UserSettings {
   id: string;
@@ -34,6 +37,7 @@ interface CrisisContact {
 
 export default function SettingsPage() {
   const { user, profile, refreshProfile } = useAuth();
+  const { notificationsEnabled, enableNotifications } = useNotifications();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -382,6 +386,13 @@ export default function SettingsPage() {
     updateSettings({ crisis_contacts: updatedContacts });
   };
 
+  const handleEnableNotifications = async () => {
+    const success = await enableNotifications();
+    if (success) {
+      updateSettings({ notifications: true });
+    }
+  };
+
   const deleteAccount = async () => {
     const confirmation = prompt(
       'This action cannot be undone. Type "DELETE" to confirm account deletion:'
@@ -700,11 +711,22 @@ export default function SettingsPage() {
                     Receive notifications for mood reminders and insights
                   </p>
                 </div>
-                <Switch
-                  id="notifications"
-                  checked={settings?.notifications || false}
-                  onCheckedChange={(checked) => updateSettings({ notifications: checked })}
-                />
+                {notificationsEnabled ? (
+                  <Switch
+                    id="notifications"
+                    checked={settings?.notifications || false}
+                    onCheckedChange={(checked) => updateSettings({ notifications: checked })}
+                  />
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleEnableNotifications}
+                  >
+                    <Bell className="w-4 h-4 mr-2" />
+                    Enable
+                  </Button>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
@@ -753,6 +775,19 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Data Export */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-medium">Export Your Data</Label>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Download all your data in JSON format
+                  </p>
+                </div>
+                <ExportButton />
               </div>
             </div>
 
