@@ -1,10 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// Uncomment to use OpenAI
+// import OpenAI from "npm:openai@4.28.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+
+// Uncomment to use OpenAI
+// const openai = new OpenAI({
+//   apiKey: Deno.env.get("OPENAI_API_KEY"),
+// });
 
 // Sophisticated emotion analysis based on transcript content
 function analyzeEmotions(transcript: string) {
@@ -138,6 +145,70 @@ function generateAIResponse(transcript: string, emotions: any): string {
   return baseResponse + intensityAddition + moodAddition;
 }
 
+// Analyze with OpenAI (uncomment to use)
+// async function analyzeWithOpenAI(transcript: string) {
+//   try {
+//     const response = await openai.chat.completions.create({
+//       model: "gpt-4",
+//       messages: [
+//         {
+//           role: "system",
+//           content: `You are an expert in emotional analysis and mental health. 
+//           Analyze the following transcript and identify the emotional state of the speaker.
+//           Return a JSON object with the following structure:
+//           {
+//             "primary": "primary emotion (anxious, sad, angry, happy, grateful, calm, etc.)",
+//             "secondary": "secondary emotion if present",
+//             "intensity": "intensity of emotion on scale of 1-10",
+//             "confidence": "confidence in analysis from 0-1",
+//             "moodScore": "overall mood score from 1-10 (10 being most positive)"
+//           }`
+//         },
+//         {
+//           role: "user",
+//           content: transcript
+//         }
+//       ],
+//       response_format: { type: "json_object" }
+//     });
+    
+//     return JSON.parse(response.choices[0].message.content);
+//   } catch (error) {
+//     console.error("OpenAI API error:", error);
+//     // Fallback to rule-based analysis
+//     return analyzeEmotions(transcript);
+//   }
+// }
+
+// Generate AI response with OpenAI (uncomment to use)
+// async function generateAIResponseWithOpenAI(transcript: string, emotions: any) {
+//   try {
+//     const response = await openai.chat.completions.create({
+//       model: "gpt-4",
+//       messages: [
+//         {
+//           role: "system",
+//           content: `You are a compassionate AI mental health companion. 
+//           The user has shared their thoughts, and you've detected their primary emotion is ${emotions.primary} 
+//           with an intensity of ${emotions.intensity}/10 and an overall mood score of ${emotions.moodScore}/10.
+//           Provide a warm, empathetic response that acknowledges their feelings and offers gentle support.
+//           Keep your response concise (2-3 sentences) and conversational.`
+//         },
+//         {
+//           role: "user",
+//           content: transcript
+//         }
+//       ]
+//     });
+    
+//     return response.choices[0].message.content;
+//   } catch (error) {
+//     console.error("OpenAI API error:", error);
+//     // Fallback to rule-based response
+//     return generateAIResponse(transcript, emotions);
+//   }
+// }
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -145,16 +216,20 @@ serve(async (req) => {
   }
 
   try {
-    const { transcript, duration } = await req.json();
+    const { transcript, duration, audioUrl } = await req.json();
 
     if (!transcript) {
       throw new Error('Transcript is required');
     }
 
     // Analyze emotions
+    // For OpenAI integration, uncomment the following line and comment out the line below it
+    // const emotions = await analyzeWithOpenAI(transcript);
     const emotions = analyzeEmotions(transcript);
     
     // Generate AI response
+    // For OpenAI integration, uncomment the following line and comment out the line below it
+    // const aiResponse = await generateAIResponseWithOpenAI(transcript, emotions);
     const aiResponse = generateAIResponse(transcript, emotions);
 
     // Generate insights based on analysis
@@ -189,7 +264,8 @@ serve(async (req) => {
       aiResponse,
       insights,
       recommendations,
-      tags: [emotions.primary, 'ai-analysis', 'voice-session']
+      tags: [emotions.primary, 'ai-analysis', 'voice-session'],
+      audioUrl
     };
 
     return new Response(JSON.stringify(response), {
