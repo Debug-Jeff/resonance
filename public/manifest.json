@@ -1,0 +1,58 @@
+{
+  "name": "Resonance - AI Mental Health Companion",
+  "short_name": "Resonance",
+  "description": "Your personal AI companion for mental health and emotional wellbeing",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B5CF6",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait",
+  "categories": ["health", "lifestyle", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/dashboard.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Voice Session",
+      "url": "/voice",
+      "icons": [{ "src": "/icons/voice.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Track Mood",
+      "url": "/mood",
+      "icons": [{ "src": "/icons/mood.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshots/voice.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ]
+}

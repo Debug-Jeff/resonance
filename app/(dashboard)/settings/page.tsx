@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { 
   User, Mail, Bell, Shield, Phone, Trash2, 
   Save, Upload, Settings as SettingsIcon, 
-  Lock, Eye, EyeOff, AlertTriangle, Camera
+  Lock, Eye, EyeOff, AlertTriangle, Camera, Check
 } from 'lucide-react';
 
 interface UserSettings {
@@ -42,9 +42,20 @@ export default function SettingsPage() {
     name: profile?.name || '',
     email: user?.email || ''
   });
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [emailChangeData, setEmailChangeData] = useState({
+    newEmail: '',
+    password: ''
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
   const [crisisContacts, setCrisisContacts] = useState<CrisisContact[]>([]);
   const [newContact, setNewContact] = useState<CrisisContact>({
     name: '',
@@ -104,7 +115,6 @@ export default function SettingsPage() {
 
           if (createError) {
             console.error('Error creating settings:', createError);
-            // If we can't create settings due to RLS, set default values locally
             setSettings({
               id: 'temp',
               voice_reminders: true,
@@ -117,7 +127,6 @@ export default function SettingsPage() {
           }
         } catch (createError) {
           console.error('Error creating default settings:', createError);
-          // Set default values locally if database insert fails
           setSettings({
             id: 'temp',
             voice_reminders: true,
@@ -129,7 +138,6 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error in fetchSettings:', error);
-      // Set default values if everything fails
       setSettings({
         id: 'temp',
         voice_reminders: true,
@@ -165,9 +173,55 @@ export default function SettingsPage() {
     }
   };
 
+  const changeEmail = async () => {
+    if (!emailChangeData.newEmail || !emailChangeData.password) {
+      toast.error('Please provide both new email and current password');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // First verify the current password by attempting to sign in
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: emailChangeData.password
+      });
+
+      if (verifyError) {
+        toast.error('Current password is incorrect');
+        return;
+      }
+
+      // Update email
+      const { error } = await supabase.auth.updateUser({
+        email: emailChangeData.newEmail
+      });
+
+      if (error) throw error;
+
+      toast.success('Email change initiated! Please check your new email for confirmation.');
+      setEmailChangeData({ newEmail: '', password: '' });
+    } catch (error) {
+      console.error('Error changing email:', error);
+      toast.error('Failed to change email');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const uploadAvatar = async (file: File) => {
     setUploading(true);
     try {
+      // Validate file
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('File size must be less than 2MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
@@ -207,40 +261,52 @@ export default function SettingsPage() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('File size must be less than 2MB');
-        return;
-      }
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
-        return;
-      }
       uploadAvatar(file);
     }
   };
 
   const updatePassword = async () => {
-    if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      toast.error('Please fill in all password fields');
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
+    if (passwordData.newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters long');
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('New passwords do not match');
       return;
     }
 
     setSaving(true);
     try {
+      // First verify the current password
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: passwordData.currentPassword
+      });
+
+      if (verifyError) {
+        toast.error('Current password is incorrect');
+        return;
+      }
+
+      // Update password
       const { error } = await supabase.auth.updateUser({
-        password: newPassword
+        password: passwordData.newPassword
       });
 
       if (error) throw error;
 
       toast.success('Password updated successfully!');
-      setNewPassword('');
-      setConfirmPassword('');
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
     } catch (error) {
       console.error('Error updating password:', error);
       toast.error('Failed to update password');
@@ -253,7 +319,6 @@ export default function SettingsPage() {
     if (!settings) return;
 
     try {
-      // If settings has a real ID (not 'temp'), try to update in database
       if (settings.id !== 'temp') {
         const { error } = await supabase
           .from('user_settings')
@@ -265,12 +330,10 @@ export default function SettingsPage() {
 
         if (error) {
           console.error('Error updating settings in database:', error);
-          // Continue with local update even if database update fails
         } else {
           toast.success('Settings updated successfully!');
         }
       } else {
-        // Try to create the settings record if it doesn't exist
         try {
           const { data: newSettings, error: createError } = await supabase
             .from('user_settings')
@@ -292,11 +355,9 @@ export default function SettingsPage() {
         }
       }
 
-      // Update local state regardless of database operation result
       setSettings({ ...settings, ...updatedSettings });
     } catch (error) {
       console.error('Error updating settings:', error);
-      // Still update local state
       setSettings({ ...settings, ...updatedSettings });
       toast.error('Settings updated locally (database sync failed)');
     }
@@ -331,8 +392,6 @@ export default function SettingsPage() {
     }
 
     try {
-      // Note: In a real app, you'd want to handle this server-side
-      // This is a simplified version for demo purposes
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -435,21 +494,6 @@ export default function SettingsPage() {
               />
             </div>
 
-            {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                value={profileData.email}
-                disabled
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Email cannot be changed. Contact support if needed.
-              </p>
-            </div>
-
             <Button
               onClick={updateProfile}
               disabled={saving}
@@ -465,30 +509,117 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Security Settings */}
+        {/* Email & Password Settings */}
         <Card className="glassmorphism border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Lock className="w-5 h-5 mr-2 text-purple-600" />
-              Security & Privacy
+              Security Settings
             </CardTitle>
             <CardDescription>
-              Update your password and privacy settings
+              Update your email and password
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Password Change */}
+            {/* Current Email */}
+            <div className="space-y-2">
+              <Label>Current Email</Label>
+              <Input
+                value={user?.email || ''}
+                disabled
+                className="bg-gray-50 dark:bg-gray-800"
+              />
+            </div>
+
+            {/* Change Email */}
             <div className="space-y-4">
+              <h4 className="font-medium text-gray-900 dark:text-white">Change Email</h4>
+              
+              <div className="space-y-2">
+                <Label htmlFor="newEmail">New Email Address</Label>
+                <Input
+                  id="newEmail"
+                  type="email"
+                  value={emailChangeData.newEmail}
+                  onChange={(e) => setEmailChangeData(prev => ({ ...prev, newEmail: e.target.value }))}
+                  placeholder="Enter new email address"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="emailPassword">Current Password</Label>
+                <div className="relative">
+                  <Input
+                    id="emailPassword"
+                    type={showPasswords.current ? 'text' : 'password'}
+                    value={emailChangeData.password}
+                    onChange={(e) => setEmailChangeData(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="Enter current password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
+                  >
+                    {showPasswords.current ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                onClick={changeEmail}
+                disabled={saving || !emailChangeData.newEmail || !emailChangeData.password}
+                variant="outline"
+                className="w-full"
+              >
+                {saving ? 'Updating...' : 'Change Email'}
+              </Button>
+            </div>
+
+            {/* Change Password */}
+            <div className="space-y-4 border-t pt-6">
               <h4 className="font-medium text-gray-900 dark:text-white">Change Password</h4>
               
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <div className="relative">
+                  <Input
+                    id="currentPassword"
+                    type={showPasswords.current ? 'text' : 'password'}
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                    placeholder="Enter current password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
+                  >
+                    {showPasswords.current ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
                   <Input
                     id="newPassword"
-                    type={showPassword ? 'text' : 'password'}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    type={showPasswords.new ? 'text' : 'password'}
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                     placeholder="Enter new password"
                     minLength={6}
                   />
@@ -497,9 +628,9 @@ export default function SettingsPage() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
                   >
-                    {showPassword ? (
+                    {showPasswords.new ? (
                       <EyeOff className="h-4 w-4 text-gray-400" />
                     ) : (
                       <Eye className="h-4 w-4 text-gray-400" />
@@ -510,56 +641,39 @@ export default function SettingsPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  minLength={6}
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showPasswords.confirm ? 'text' : 'password'}
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    placeholder="Confirm new password"
+                    minLength={6}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
+                  >
+                    {showPasswords.confirm ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
               </div>
 
               <Button
                 onClick={updatePassword}
-                disabled={saving || !newPassword || !confirmPassword}
+                disabled={saving || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
                 variant="outline"
                 className="w-full"
               >
                 {saving ? 'Updating...' : 'Update Password'}
               </Button>
-            </div>
-
-            {/* Privacy Level */}
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-900 dark:text-white">Privacy Level</h4>
-              <div className="space-y-2">
-                {[
-                  { value: 'low', label: 'Low', desc: 'Share insights for research' },
-                  { value: 'medium', label: 'Medium', desc: 'Balanced privacy and features' },
-                  { value: 'high', label: 'High', desc: 'Maximum privacy protection' }
-                ].map((level) => (
-                  <div key={level.value} className="flex items-center space-x-3">
-                    <input
-                      type="radio"
-                      id={level.value}
-                      name="privacy"
-                      value={level.value}
-                      checked={settings?.privacy_level === level.value}
-                      onChange={(e) => updateSettings({ privacy_level: e.target.value })}
-                      className="text-purple-600"
-                    />
-                    <div>
-                      <Label htmlFor={level.value} className="font-medium">
-                        {level.label}
-                      </Label>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {level.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -569,10 +683,10 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Bell className="w-5 h-5 mr-2 text-purple-600" />
-              Notifications
+              Notifications & Privacy
             </CardTitle>
             <CardDescription>
-              Configure how you want to be notified
+              Configure how you want to be notified and your privacy settings
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -607,6 +721,38 @@ export default function SettingsPage() {
                   checked={settings?.voice_reminders || false}
                   onCheckedChange={(checked) => updateSettings({ voice_reminders: checked })}
                 />
+              </div>
+            </div>
+
+            {/* Privacy Level */}
+            <div className="space-y-3 border-t pt-4">
+              <h4 className="font-medium text-gray-900 dark:text-white">Privacy Level</h4>
+              <div className="space-y-2">
+                {[
+                  { value: 'low', label: 'Low', desc: 'Share insights for research' },
+                  { value: 'medium', label: 'Medium', desc: 'Balanced privacy and features' },
+                  { value: 'high', label: 'High', desc: 'Maximum privacy protection' }
+                ].map((level) => (
+                  <div key={level.value} className="flex items-center space-x-3">
+                    <input
+                      type="radio"
+                      id={level.value}
+                      name="privacy"
+                      value={level.value}
+                      checked={settings?.privacy_level === level.value}
+                      onChange={(e) => updateSettings({ privacy_level: e.target.value })}
+                      className="text-purple-600"
+                    />
+                    <div>
+                      <Label htmlFor={level.value} className="font-medium">
+                        {level.label}
+                      </Label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {level.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
