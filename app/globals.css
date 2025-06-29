@@ -210,3 +210,28 @@
   background: linear-gradient(90deg, #374151 25%, transparent 50%, #374151 75%);
   background-size: 200% 100%;
 }
+
+/* Fix for dark mode input and textarea */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1f2937 !important; /* Darker gray instead of black */
+  color: #f3f4f6 !important;
+}
+
+/* Fix for mobile buttons */
+@media (max-width: 640px) {
+  .mobile-full-width {
+    width: 100% !important;
+    margin-top: 0.5rem;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-center {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+}

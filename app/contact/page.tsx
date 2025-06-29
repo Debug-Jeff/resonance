@@ -85,6 +85,43 @@ export default function ContactPage() {
         throw error;
       }
       
+      // Send email notification using Resend
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer re_LJkvCUbj_HwN4bvNkagtLhwrYjAAc5Dsa`
+          },
+          body: JSON.stringify({
+            from: 'Resonance Contact <support@resonance.ai>',
+            to: 'admin@resonance.ai', // Change to your admin email
+            subject: `New Contact Form: ${formData.subject}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #8B5CF6;">New Contact Form Submission</h1>
+                <div style="margin: 20px 0; padding: 15px; border-left: 4px solid #8B5CF6;">
+                  <p><strong>Name:</strong> ${formData.name}</p>
+                  <p><strong>Email:</strong> ${formData.email}</p>
+                  <p><strong>Type:</strong> ${formData.type}</p>
+                  <p><strong>Subject:</strong> ${formData.subject}</p>
+                </div>
+                <div style="margin-top: 30px;">
+                  <h2 style="color: #4B5563;">Message:</h2>
+                  <p style="line-height: 1.6;">${formData.message.replace(/\n/g, '<br>')}</p>
+                </div>
+              </div>
+            `
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Failed to send email notification');
+        }
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+      }
+      
       toast.success('Message sent successfully! We\'ll get back to you within 24 hours.');
       setFormData({
         name: '',

@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
-import { Heart, Eye, EyeOff, Mail, Lock, User, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Heart, Eye, EyeOff, Mail, Lock, User, ArrowLeft, ArrowRight, Phone } from 'lucide-react';
 
 export default function SignUpPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -20,6 +20,7 @@ export default function SignUpPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    phone: '',
     gender: '',
     ageRange: '',
     mentalHealthGoals: [] as string[],
@@ -84,6 +85,7 @@ export default function SignUpPage() {
           data: {
             name: formData.name,
             avatar_url: avatarUrl,
+            phone: formData.phone,
             gender: formData.gender,
             age_range: formData.ageRange,
             mental_health_goals: formData.mentalHealthGoals,
@@ -126,7 +128,7 @@ export default function SignUpPage() {
 
   const nextStep = () => {
     if (currentStep === 1) {
-      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.phone) {
         toast.error('Please fill in all required fields');
         return;
       }
@@ -245,6 +247,23 @@ export default function SignUpPage() {
                         type="email"
                         placeholder="Enter your email"
                         value={formData.email}
+                        onChange={handleInputChange}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        value={formData.phone}
                         onChange={handleInputChange}
                         className="pl-10"
                         required
