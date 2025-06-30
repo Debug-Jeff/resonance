@@ -7,7 +7,7 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = withPWA({
-  output: 'export',
+  // Removed 'output: export' to fix webpack caching and file resolution errors
   eslint: {
     ignoreDuringBuilds: true,
   },
