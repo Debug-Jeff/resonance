@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Heart, Users, Award, Target, Brain, Shield, 
-  Lightbulb, Sparkles, CheckCircle, Star
+  Lightbulb, Sparkles, CheckCircle, Star, Linkedin, Mail, ExternalLink
 } from 'lucide-react';
 
 const values = [
@@ -42,28 +42,36 @@ const team = [
     role: 'Co-Founder & Frontend Engineer',
     bio: 'Frontend engineer and product strategist with a passion for building compassionate, voice-driven mental health tools.',
     image: 'https://avatar.iran.liara.run/public/36?w=300',
-    credentials: 'BSc. Computer Science, Africa Nazarene University'
+    credentials: 'BSc. Computer Science, Africa Nazarene University',
+    linkedin: 'https://linkedin.com/in/jeffmutugi',
+    email: 'jeff@resonance.ai'
   },
   {
     name: 'Stanley Mwendwa',
     role: 'Co-Founder & Backend Engineer',
     bio: 'Backend engineer focused on scalable AI systems, with a strong drive to make mental health support universally accessible.',
     image: 'https://avatar.iran.liara.run/public/13?w=300',
-    credentials: 'BSc. Computer Science, Africa Nazarene University'
+    credentials: 'BSc. Computer Science, Africa Nazarene University',
+    linkedin: 'https://linkedin.com/in/stanleymwendwa',
+    email: 'stanley@resonance.ai'
   },
   {
     name: 'Rachel Mugisha',
     role: 'UI/UX Designer',
     bio: 'UX designer blending psychology and design to craft intuitive, emotionally intelligent user experiences.',
     image: 'https://avatar.iran.liara.run/public/65?w=300',
-    credentials: 'BSc. BBIT, Africa Nazarene University'
+    credentials: 'BSc. BBIT, Africa Nazarene University',
+    linkedin: 'https://linkedin.com/in/rachelmugisha',
+    email: 'rachel@resonance.ai'
   },
   {
     name: 'Jesse Jacob',
     role: 'Head of AI Research',
     bio: 'AI researcher exploring affective computing and emotion-aware interfaces for real-world mental health applications.',
     image: 'https://avatar.iran.liara.run/public/2?w=300',
-    credentials: 'BSc. Computer Science, Africa Nazarene University'
+    credentials: 'BSc. Computer Science, Africa Nazarene University',
+    linkedin: 'https://linkedin.com/in/jessejacob',
+    email: 'jesse@resonance.ai'
   }
 ];
 
@@ -205,25 +213,45 @@ export default function AboutPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {team.map((member, index) => (
-                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
-                  <CardContent className="p-6 text-center">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                    />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      {member.name}
-                    </h3>
-                    <p className="text-sm text-purple-600 dark:text-purple-400 mb-3">
-                      {member.role}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      {member.bio}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
-                      {member.credentials}
-                    </p>
+                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <div className="h-48 overflow-hidden">
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-110"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <div className="p-4 w-full">
+                          <div className="flex justify-center space-x-3">
+                            <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors">
+                              <Linkedin className="w-4 h-4 text-white" />
+                            </a>
+                            <a href={`mailto:${member.email}`} className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors">
+                              <Mail className="w-4 h-4 text-white" />
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                        {member.name}
+                      </h3>
+                      <p className="text-sm text-purple-600 dark:text-purple-400 mb-3">
+                        {member.role}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">
+                        {member.bio}
+                      </p>
+                      <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                          {member.credentials}
+                        </p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
