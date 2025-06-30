@@ -162,7 +162,7 @@ export default function FAQPage() {
           <div className="mx-auto max-w-4xl px-6 lg:px-8">
             <div className="space-y-6">
               {/* Search */}
-              <div className="relative">
+              {/* <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search frequently asked questions..."
@@ -170,7 +170,7 @@ export default function FAQPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 glassmorphism border-0 shadow-lg"
                 />
-              </div>
+              </div> */}
 
               {/* Category Filter */}
               <div className="flex flex-wrap gap-3">

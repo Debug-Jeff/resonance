@@ -32,6 +32,8 @@ export function Navigation() {
     await signOut();
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <>
       {/* Mobile menu button */}
@@ -39,7 +41,7 @@ export function Navigation() {
         <Button
           variant="outline"
           size="icon"
-          className="glassmorphism"
+          className="glassmorphism bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -50,7 +52,7 @@ export function Navigation() {
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeSidebar}
         />
       )}
 
@@ -67,7 +69,7 @@ export function Navigation() {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-center h-16 px-4 border-b border-purple-200/50 dark:border-purple-800/50">
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href="/dashboard" className="flex items-center space-x-2" onClick={closeSidebar}>
               <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
                 <Heart className="w-4 h-4 text-white" />
               </div>
@@ -92,7 +94,7 @@ export function Navigation() {
                       ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg"
                       : "text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-purple-600 dark:hover:text-purple-400"
                   )}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={closeSidebar}
                 >
                   <item.icon className="w-5 h-5 mr-3" />
                   {item.name}

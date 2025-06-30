@@ -107,12 +107,11 @@ const plans = [
     name: 'Pro',
     price: '$19',
     period: 'per month',
-    description: 'Advanced features for serious mental health improvement',
+    description: 'Advanced features for mental health improvement',
     features: [
       'Unlimited voice sessions',
       'Advanced AI analysis',
       'Comprehensive analytics',
-      'CBT tools & exercises',
       'Priority support',
       'Export data',
       'Custom reminders'
@@ -129,7 +128,7 @@ const plans = [
       'Everything in Pro',
       'Therapist collaboration tools',
       'Advanced crisis support',
-      'Family sharing (up to 4)',
+      'Family sharing',
       'White-label options',
       'API access',
       'Dedicated support'
@@ -139,6 +138,28 @@ const plans = [
   }
 ];
 
+// Uncomment this section when you have actual testimonials to display 
+// const testimonials = [
+//   {
+//     content: "The voice analysis feature is incredible. It picks up on emotions I didn't even realize I was feeling.",
+//     author: "Sarah M.",
+//     role: "Marketing Professional",
+//     rating: 5
+//   },
+//   {
+//     content: "As a therapist, I recommend Resonance to my clients. The analytics help track progress between sessions.",
+//     author: "Dr. James Wilson",
+//     role: "Clinical Psychologist",
+//     rating: 5
+//   },
+//   {
+//     content: "The crisis support features gave me peace of mind during my darkest moments. Truly life-changing.",
+//     author: "Maria R.",
+//     role: "College Student",
+//     rating: 5
+//   }
+// ];
+
 export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
@@ -146,20 +167,12 @@ export default function ServicesPage() {
       
       <div className="pt-24">
         {/* Hero Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden">
-          {/* Background elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 animate-pulse"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gradient-to-br from-blue-400/10 to-cyan-400/10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-          </div>
-
-          <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <section className="py-24 sm:py-32">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <Badge variant="secondary" className="glassmorphism px-4 py-2 mb-8 border-0 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
+              <Badge variant="secondary" className="glassmorphism px-4 py-2 mb-8">
                 <Sparkles className="w-4 h-4 mr-2" />
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-medium">
-                  Our Services
-                </span>
+                Our Services
               </Badge>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
                 Comprehensive{' '}
@@ -181,9 +194,9 @@ export default function ServicesPage() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.map((service, index) => (
-                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 group">
+                <Card key={index} className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300">
                   <CardContent className="p-8">
-                    <div className={`w-16 h-16 rounded-2xl ${service.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                    <div className={`w-16 h-16 rounded-2xl ${service.gradient} flex items-center justify-center mb-6`}>
                       <service.icon className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
@@ -212,7 +225,7 @@ export default function ServicesPage() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                How Resonance Works
+                How Resonance Works?
               </h2>
               <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
                 Simple steps to start your mental health journey
@@ -220,47 +233,41 @@ export default function ServicesPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 text-center">
-                <CardContent className="p-8">
-                  <div className="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-white">1</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                    Sign Up & Setup
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Create your account and complete a brief assessment to personalize your experience.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-white">1</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  Sign Up & Setup
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Create your account and complete a brief assessment to personalize your experience.
+                </p>
+              </div>
               
-              <Card className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 text-center">
-                <CardContent className="p-8">
-                  <div className="w-16 h-16 rounded-full gradient-secondary flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-white">2</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                    Track & Record
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Use our tools to track your mood, record voice sessions, and journal your thoughts.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full gradient-secondary flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-white">2</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  Track & Record
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Use our tools to track your mood, record voice sessions, and journal your thoughts.
+                </p>
+              </div>
               
-              <Card className="glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 text-center">
-                <CardContent className="p-8">
-                  <div className="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-white">3</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                    Get Insights
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Receive AI-powered insights, recommendations, and track your progress over time.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full gradient-accent flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-white">3</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  Get Insights
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Receive AI-powered insights, recommendations, and track your progress over time.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -279,15 +286,13 @@ export default function ServicesPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {plans.map((plan, index) => (
-                <Card key={index} className={`glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 ${plan.popular ? 'ring-2 ring-purple-500 relative' : ''}`}>
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <Badge className="gradient-primary text-white px-4 py-1">
+                <Card key={index} className={`glassmorphism border-0 shadow-xl hover:scale-105 transition-all duration-300 ${plan.popular ? 'ring-2 ring-purple-500' : ''}`}>
+                  <CardContent className="p-8">
+                    {plan.popular && (
+                      <Badge className="gradient-primary text-white mb-4">
                         Most Popular
                       </Badge>
-                    </div>
-                  )}
-                  <CardContent className="p-8">
+                    )}
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                       {plan.name}
                     </h3>
@@ -322,6 +327,42 @@ export default function ServicesPage() {
             </div>
           </div>
         </section>
+
+        {/* Testimonials */}
+        {/* <section className="py-24 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                What Our Users Say
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <Card key={index} className="glassmorphism border-0 shadow-xl">
+                  <CardContent className="p-8">
+                    <div className="flex items-center mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6 leading-7">
+                      "{testimonial.content}"
+                    </p>
+                    <div>
+                      <div className="font-semibold text-gray-900 dark:text-white">
+                        {testimonial.author}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {testimonial.role}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section> */}
 
         {/* CTA Section */}
         <section className="py-24">
