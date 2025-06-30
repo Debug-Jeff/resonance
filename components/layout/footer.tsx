@@ -13,13 +13,14 @@ const navigation = {
   company: [
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
-    { name: 'Privacy Policy', href: '#' },
-    { name: 'Terms of Service', href: '#' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
   ],
   resources: [
     { name: 'Help Center', href: '/help' },
     { name: 'Mental Health Resources', href: '#' },
-    { name: 'Crisis Support', href: '#' },
+    { name: 'Crisis Support', href: '/crisis' },
+    { name: 'Cookies', href: '/cookies' },
   ],
   social: [
     {
@@ -154,13 +155,13 @@ export function Footer() {
               &copy; 2025 Resonance AI, Inc. All rights reserved.
             </p>
             <div className="mt-4 sm:mt-0 flex space-x-6 text-xs text-gray-500 dark:text-gray-400">
-              <Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={(e) => e.preventDefault()}>
+              <Link href="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                 Privacy
               </Link>
-              <Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={(e) => e.preventDefault()}>
+              <Link href="/terms" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                 Terms
               </Link>
-              <Link href="#" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={(e) => e.preventDefault()}>
+              <Link href="/cookies" className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
                 Cookies
               </Link>
             </div>
