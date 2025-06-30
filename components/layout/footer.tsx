@@ -6,7 +6,7 @@ import { Heart, Mail, Phone, MapPin, Twitter, Github, Linkedin } from 'lucide-re
 const navigation = {
   product: [
     { name: 'Features', href: '/services' },
-    { name: 'Pricing', href: '/services#pricing' },
+    { name: 'Pricing', href: '#' },
     { name: 'FAQ', href: '/faq' },
     { name: 'Support', href: '/contact' },
   ],
@@ -17,7 +17,7 @@ const navigation = {
     { name: 'Terms of Service', href: '#' },
   ],
   resources: [
-    { name: 'Help Center', href: '/help' },
+    { name: 'Help Center', href: '#' },
     { name: 'Mental Health Resources', href: '#' },
     { name: 'Crisis Support', href: '#' },
   ],
